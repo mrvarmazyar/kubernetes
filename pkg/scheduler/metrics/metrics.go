@@ -106,6 +106,7 @@ var (
 
 	PodSchedulingSLIDuration        *metrics.HistogramVec
 	PodSchedulingAttempts           *metrics.Histogram
+	PodScheduledAfterFlush          *metrics.Counter
 	FrameworkExtensionPointDuration *metrics.HistogramVec
 	PluginExecutionDuration         *metrics.HistogramVec
 
@@ -251,6 +252,14 @@ func InitMetrics() {
 			StabilityLevel: metrics.STABLE,
 		})
 
+	PodScheduledAfterFlush = metrics.NewCounter(
+		&metrics.CounterOpts{
+			Subsystem:      SchedulerSubsystem,
+			Name:           "pod_scheduled_after_flush_total",
+			Help:           "Number of pods that were successfully scheduled after being flushed from unschedulablePods due to timeout. This metric helps detect potential queue hint bugs or event handling issues.",
+			StabilityLevel: metrics.ALPHA,
+		})
+
 	FrameworkExtensionPointDuration = metrics.NewHistogramVec(
 		&metrics.HistogramOpts{
 			Subsystem: SchedulerSubsystem,
@@ -387,6 +396,7 @@ func InitMetrics() {
 		pendingPods,
 		PodSchedulingSLIDuration,
 		PodSchedulingAttempts,
+		PodScheduledAfterFlush,
 		FrameworkExtensionPointDuration,
 		PluginExecutionDuration,
 		SchedulerQueueIncomingPods,
